@@ -63,17 +63,18 @@ def metropolis_hastings_rw(
     """
     sub_matrix = np.zeros(adj_matrix.shape)
     degrees = graph_metrics.degree_distribution(adj_matrix)
-    current_node = np.random.choice(adj_matrix.shape[0])
+    current_node = row = np.random.choice(adj_matrix.shape[0])
     edges_added = 0
     while edges_added < n_edges:
         neighbors = np.nonzero(adj_matrix[current_node, :])[0]
-        candidate = np.random.choice(neighbors)
+        candidate = col = np.random.choice(neighbors)
         acceptance_ratio = degrees[current_node] / degrees[candidate]
         if np.random.uniform(0, 1) <= acceptance_ratio:
-            sub_matrix[current_node, candidate] = 1
-            sub_matrix[candidate, current_node] = 1
-            current_node = candidate
-            edges_added += 1
+            if sub_matrix[row, col] != 1 and sub_matrix[col, row] != 1:
+                edges_added += 1
+                sub_matrix[row, col] = 1
+                sub_matrix[col, row] = 1
+            current_node = row = candidate
     return sub_matrix
 
 
@@ -104,9 +105,10 @@ def frontier_sampling(
         neighbors = np.nonzero(adj_matrix[current_node, :])[0]
         new_node = col = np.random.choice(neighbors)
         frontier[np.where(frontier == current_node)[0][0]] = new_node
-        sub_matrix[row, col] = 1
-        sub_matrix[col, row] = 1
-        edges_added += 1
+        if sub_matrix[row, col] != 1 and sub_matrix[col, row] != 1:
+            edges_added += 1
+            sub_matrix[row, col] = 1
+            sub_matrix[col, row] = 1
     return sub_matrix
 
 
