@@ -49,9 +49,13 @@ def sir_propagation(
     if initial_infected in initial_recovered:
         raise ValueError('initial_infected cannot be in initial_recovered')
 
+    # set initial infected
     susceptible[initial_infected] = False
     infectious[initial_infected]  = True
-    recovered[initial_recovered]  = True
+
+    # set initial recovered
+    susceptible[initial_recovered] = False
+    recovered[initial_recovered]   = True
 
     step_count = 1
     while (step_count <= n_steps) and np.any(infectious):
